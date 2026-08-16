@@ -4,7 +4,7 @@ A single-file random poster-layout generator inspired by an off-kilter editorial
 
 ## Open it
 
-Open `layout-creator.html` in any modern web browser. No installation, server, or dependencies are required.
+Open `layout-creator web` in any modern web browser. No installation, server, or dependencies are required.
 
 ## Use it
 
