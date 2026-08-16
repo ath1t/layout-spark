@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Layout Spark — Random Layout Creator</title>
+  <style>
+    :root { --ink: #121212; --paper: #f6f3ed; --card: #fffdfa; --accent: #ff5e3a; --line: #d5d0c8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: Arial, Helvetica, sans-serif; }
+    button, select { font: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 300px 1fr; }
+    aside { padding: 28px; border-right: 1px solid var(--ink); background: #ebe7df; display: flex; flex-direction: column; gap: 26px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.05em; font-size: 22px; }
+    .spark { display: inline-grid; width: 26px; height: 26px; place-items: center; border: 2px solid var(--ink); border-radius: 50%; font-size: 17px; background: var(--accent); }
+    h1 { margin: 0; font-size: 37px; line-height: .96; letter-spacing: -.07em; }
+    .lead { margin: -11px 0 0; color: #57534d; font-size: 14px; line-height: 1.45; }
+    .controls { display: grid; gap: 15px; }
+    label { display: grid; gap: 7px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    select { width: 100%; padding: 11px 12px; border: 1px solid var(--ink); border-radius: 0; background: var(--card); color: var(--ink); }
+    button { min-height: 47px; border: 1px solid var(--ink); border-radius: 0; cursor: pointer; font-weight: 800; }
+    .primary { background: var(--accent); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); transition: transform .15s, box-shadow .15s; }
+    .primary:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+    .secondary { background: transparent; }
+    .secondary:hover { background: var(--ink); color: white; }
+    .tips { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.55; color: #57534d; }
+    main { padding: 28px; display: grid; grid-template-rows: auto 1fr; gap: 22px; overflow: hidden; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .eyebrow { margin: 0; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+    .meta { font-size: 12px; color: #57534d; }
+    .canvas-wrap { min-height: 620px; display: grid; place-items: center; padding: 22px; border: 1px solid var(--ink); background: repeating-linear-gradient(0deg, transparent, transparent 29px, #e5e0d8 30px), repeating-linear-gradient(90deg, transparent, transparent 29px, #e5e0d8 30px); overflow: auto; }
+    .canvas { position: relative; width: min(100%, 960px); aspect-ratio: 4 / 5; min-width: 620px; overflow: hidden; border: 1.5px solid var(--ink); background: var(--card); box-shadow: 10px 10px 0 rgba(18,18,18,.11); }
+    .element { position: absolute; display: grid; place-items: center; padding: 12px; text-align: center; overflow: hidden; border: 1.5px solid currentColor; color: var(--ink); background: var(--fill, transparent); font-weight: 700; line-height: .92; letter-spacing: -.05em; }
+    .element .mini { font-size: clamp(10px, 1.5vw, 16px); letter-spacing: .04em; text-transform: uppercase; }
+    .logo { font-size: clamp(21px, 4vw, 52px); font-weight: 900; letter-spacing: -.09em; }
+    .headline { font-size: clamp(38px, 7vw, 96px); font-weight: 900; }
+    .product { font-size: clamp(27px, 5.5vw, 77px); font-weight: 800; }
+    .contact { font-size: clamp(17px, 2.6vw, 34px); font-weight: 800; }
+    .caption { position: absolute; font-size: clamp(11px, 1.5vw, 18px); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    @media (max-width: 780px) { .app { grid-template-columns: 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--ink); } .tips { margin-top: 0; } main { padding: 18px; } .canvas-wrap { padding: 12px; min-height: 500px; } .canvas { min-width: 520px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand"><span class="spark">✦</span> Layout Spark</div>
+      <h1>Make a strange, beautiful layout.</h1>
+      <p class="lead">A playful poster generator based on the wonderfully off-kilter arrangement in your reference.</p>
+      <div class="controls">
+        <label>Format <select id="format"><option value="poster">Poster</option><option value="square">Square</option><option value="story">Story</option></select></label>
+        <label>Palette <select id="palette"><option value="mono">Paper & ink</option><option value="citrus">Citrus pop</option><option value="ocean">Cool ocean</option><option value="candy">Candy shop</option></select></label>
+        <button class="primary" id="shuffle">✦ Generate layout</button>
+        <button class="secondary" id="download">Download SVG</button>
+      </div>
+      <p class="tips">Every generation keeps the same core building blocks—logo, headline, product, contact—and rearranges their scale, rotation, and position.</p>
+    </aside>
+    <main>
+      <div class="topbar"><p class="eyebrow">Random composition no. <span id="number">01</span></p><span class="meta">Click Generate for a new arrangement</span></div>
+      <div class="canvas-wrap"><section class="canvas" id="canvas" aria-label="Generated poster layout"></section></div>
+    </main>
+  </div>
+  <script>
+    const canvas = document.querySelector('#canvas');
+    const format = document.querySelector('#format');
+    const palette = document.querySelector('#palette');
+    const number = document.querySelector('#number');
+    let sequence = 0;
+    const palettes = {
+      mono: { paper: '#fffdfa', ink: '#121212', accent: '#ff5e3a', soft: '#f0ece4' },
+      citrus: { paper: '#fff8d8', ink: '#12302b', accent: '#ff7a00', soft: '#b4e647' },
+      ocean: { paper: '#e9f4f5', ink: '#153348', accent: '#ff5f5f', soft: '#8ed1dc' },
+      candy: { paper: '#fff0f5', ink: '#352040', accent: '#ff4f91', soft: '#a9e6d0' }
+    };
+    const layouts = [
+      { logo:[42,4,19,23,0], headline:[3,29,94,23,-4], product:[10,59,80,31,0], contact:[3,94,94,5,0], bits:[[8,7,15,19,-1],[67,16,5,10,0],[77,9,7,12,0],[97,33,5,12,0],[0,57,7,15,0]] },
+      { logo:[7,7,24,16,-5], headline:[29,9,65,29,4], product:[7,48,55,43,-2], contact:[67,73,27,14,90], bits:[[72,43,16,7,4],[76,4,13,9,0],[6,30,8,12,8],[93,15,5,18,0]] },
+      { logo:[66,6,25,17,2], headline:[6,31,50,52,-7], product:[60,44,32,40,5], contact:[6,91,86,6,0], bits:[[8,7,15,13,0],[31,7,10,9,0],[75,26,17,9,-6],[3,60,8,12,0]] },
+      { logo:[35,6,30,19,0], headline:[4,29,92,18,6], product:[19,53,63,34,-4], contact:[4,93,92,5,0], bits:[[5,7,17,17,0],[75,8,8,14,0],[89,57,8,14,0],[3,75,10,9,0]] }
+    ];
+    function block(className, text, item, fill = 'transparent') {
+      const [left, top, width, height, rotate] = item;
+      return `<div class="element ${className}" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;transform:rotate(${rotate}deg);--fill:${fill}">${text}</div>`;
+    }
+    function render() {
+      const p = palettes[palette.value];
+      const layout = layouts[Math.floor(Math.random() * layouts.length)];
+      sequence += 1; number.textContent = String(sequence).padStart(2, '0');
+      canvas.style.background = p.paper; canvas.style.color = p.ink;
+      canvas.innerHTML = block('logo', 'NOVA', layout.logo, p.soft)
+        + block('headline', 'MAKE SPACE<br>FOR GOOD IDEAS', layout.headline, 'transparent')
+        + block('product', 'YOUR<br>PRODUCT', layout.product, p.accent)
+        + block('contact', 'HELLO@NOVA.STUDIO&nbsp;&nbsp; / &nbsp;&nbsp;@NOVASTUDIO', layout.contact, p.soft)
+        + layout.bits.map((item, index) => block('', `<span class="mini">Element ${index + 1}</span>`, item, index % 2 ? p.soft : 'transparent')).join('');
+    }
+    function setFormat() {
+      canvas.style.aspectRatio = format.value === 'square' ? '1 / 1' : format.value === 'story' ? '9 / 16' : '4 / 5';
+      render();
+    }
+    document.querySelector('#shuffle').addEventListener('click', render);
+    palette.addEventListener('change', render);
+    format.addEventListener('change', setFormat);
+    document.querySelector('#download').addEventListener('click', () => {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500"><foreignObject width="100%" height="100%">${new XMLSerializer().serializeToString(canvas)}</foreignObject></svg>`;
+      const link = document.createElement('a'); link.download = 'layout-spark.svg'; link.href = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })); link.click(); URL.revokeObjectURL(link.href);
+    });
+    render();
+  </script>
+</body>
+</html>
