@@ -36,6 +36,7 @@
     .headline { font-size: clamp(38px, 7vw, 96px); font-weight: 900; }
     .product { font-size: clamp(27px, 5.5vw, 77px); font-weight: 800; }
     .contact { font-size: clamp(17px, 2.6vw, 34px); font-weight: 800; }
+    .watermark { position: absolute; right: 1.6%; bottom: 1.4%; z-index: 2; font-size: clamp(7px, 1vw, 12px); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .68; }
     .caption { position: absolute; font-size: clamp(11px, 1.5vw, 18px); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     @media (max-width: 780px) { .app { grid-template-columns: 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--ink); } .tips { margin-top: 0; } main { padding: 18px; } .canvas-wrap { padding: 12px; min-height: 500px; } .canvas { min-width: 520px; } }
   </style>
@@ -90,7 +91,8 @@
         + block('headline', 'MAKE SPACE<br>FOR GOOD IDEAS', layout.headline, 'transparent')
         + block('product', 'YOUR<br>PRODUCT', layout.product, p.accent)
         + block('contact', 'HELLO@NOVA.STUDIO&nbsp;&nbsp; / &nbsp;&nbsp;@NOVASTUDIO', layout.contact, p.soft)
-        + layout.bits.map((item, index) => block('', `<span class="mini">Element ${index + 1}</span>`, item, index % 2 ? p.soft : 'transparent')).join('');
+        + layout.bits.map((item, index) => block('', `<span class="mini">Element ${index + 1}</span>`, item, index % 2 ? p.soft : 'transparent')).join('')
+        + '<footer class="watermark">Developed by Htun Thit Oo @ 2026</footer>';
     }
     function setFormat() {
       canvas.style.aspectRatio = format.value === 'square' ? '1 / 1' : format.value === 'story' ? '9 / 16' : '4 / 5';
