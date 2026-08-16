@@ -33,9 +33,9 @@
     .toggle { min-height: 34px; padding: 0 11px; background: transparent; color: var(--ink); font-size: 12px; }
     .toggle.active { background: var(--ink); color: var(--paper); }
     .canvas-wrap { width: 100%; min-height: 620px; display: grid; place-items: center; padding: 22px; border: 1px solid var(--ink); background: repeating-linear-gradient(0deg, transparent, transparent 29px, var(--grid) 30px), repeating-linear-gradient(90deg, transparent, transparent 29px, var(--grid) 30px); overflow: auto; }
-    .canvas { container-type: inline-size; position: relative; width: min(100%, 960px); aspect-ratio: 4 / 5; min-width: 0; overflow: hidden; border: 1.5px solid var(--ink); background: var(--card); box-shadow: 10px 10px 0 rgba(18,18,18,.11); }
+    .canvas { container-type: inline-size; position: relative; width: min(100%, 960px); aspect-ratio: 4 / 5; min-width: 0; overflow: hidden; border: 1.5px solid var(--canvas-ink, var(--ink)); background: var(--card); box-shadow: 10px 10px 0 rgba(18,18,18,.11); }
     .canvas.mobile-preview { width: min(375px, 100%); }
-    .element { position: absolute; display: grid; place-items: center; padding: 12px; text-align: center; overflow: hidden; border: 1.5px solid currentColor; color: var(--ink); background: var(--fill, transparent); font-weight: 700; line-height: .92; letter-spacing: -.05em; }
+    .element { position: absolute; display: grid; place-items: center; padding: 12px; text-align: center; overflow: hidden; border: 1.5px solid currentColor; color: var(--canvas-ink, var(--ink)); background: var(--fill, transparent); font-weight: 700; line-height: .92; letter-spacing: -.05em; }
     .element .mini { font-size: clamp(7px, 1.5cqw, 16px); letter-spacing: .04em; text-transform: uppercase; }
     .logo { font-size: clamp(18px, 4cqw, 52px); font-weight: 900; letter-spacing: -.09em; }
     .headline { font-size: clamp(28px, 7cqw, 96px); font-weight: 900; }
@@ -94,7 +94,8 @@
       const layout = layouts[Math.floor(Math.random() * layouts.length)];
       currentLayout = layout;
       sequence += 1; number.textContent = String(sequence).padStart(2, '0');
-      canvas.style.background = p.paper; canvas.style.color = p.ink;
+      canvas.style.background = p.paper;
+      canvas.style.setProperty('--canvas-ink', p.ink);
       canvas.innerHTML = block('logo', 'NOVA', layout.logo, p.soft)
         + block('headline', 'MAKE SPACE<br>FOR GOOD IDEAS', layout.headline, 'transparent')
         + block('product', 'YOUR<br>PRODUCT', layout.product, p.accent)
