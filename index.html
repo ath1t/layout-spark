@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Layout Spark — Random Layout Creator</title>
   <style>
-    :root { --ink: #121212; --paper: #f6f3ed; --card: #fffdfa; --accent: #ff5e3a; --line: #d5d0c8; }
+    :root { --ink: #121212; --paper: #f6f3ed; --card: #fffdfa; --accent: #ff5e3a; --line: #d5d0c8; --panel: #ebe7df; --grid: #e5e0d8; }
+    body.dark { --ink: #f8f4ec; --paper: #1d1c1b; --card: #282625; --accent: #ff7859; --line: #4b4844; --panel: #252321; --grid: #35322f; }
     * { box-sizing: border-box; }
     body { margin: 0; color: var(--ink); background: var(--paper); font-family: Arial, Helvetica, sans-serif; }
     button, select { font: inherit; }
-    .app { min-height: 100vh; display: grid; grid-template-columns: 300px 1fr; }
-    aside { padding: 28px; border-right: 1px solid var(--ink); background: #ebe7df; display: flex; flex-direction: column; gap: 26px; }
+    .app { min-height: 100vh; min-height: 100dvh; display: grid; grid-template-columns: 300px minmax(0, 1fr); }
+    aside { padding: 28px; border-right: 1px solid var(--ink); background: var(--panel); display: flex; flex-direction: column; gap: 26px; }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.05em; font-size: 22px; }
     .spark { display: inline-grid; width: 26px; height: 26px; place-items: center; border: 2px solid var(--ink); border-radius: 50%; font-size: 17px; background: var(--accent); }
     h1 { margin: 0; font-size: 37px; line-height: .96; letter-spacing: -.07em; }
-    .lead { margin: -11px 0 0; color: #57534d; font-size: 14px; line-height: 1.45; }
+    .lead { margin: -11px 0 0; color: color-mix(in srgb, var(--ink) 65%, transparent); font-size: 14px; line-height: 1.45; }
     .controls { display: grid; gap: 15px; }
     label { display: grid; gap: 7px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
     select { width: 100%; padding: 11px 12px; border: 1px solid var(--ink); border-radius: 0; background: var(--card); color: var(--ink); }
@@ -23,22 +24,27 @@
     .primary:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
     .secondary { background: transparent; }
     .secondary:hover { background: var(--ink); color: white; }
-    .tips { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.55; color: #57534d; }
-    main { padding: 28px; display: grid; grid-template-rows: auto 1fr; gap: 22px; overflow: hidden; }
+    .tips { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.55; color: color-mix(in srgb, var(--ink) 65%, transparent); }
+    main { min-width: 0; padding: 28px; display: grid; grid-template-rows: auto 1fr; gap: 22px; overflow: hidden; }
     .topbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
     .eyebrow { margin: 0; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
-    .meta { font-size: 12px; color: #57534d; }
-    .canvas-wrap { min-height: 620px; display: grid; place-items: center; padding: 22px; border: 1px solid var(--ink); background: repeating-linear-gradient(0deg, transparent, transparent 29px, #e5e0d8 30px), repeating-linear-gradient(90deg, transparent, transparent 29px, #e5e0d8 30px); overflow: auto; }
-    .canvas { position: relative; width: min(100%, 960px); aspect-ratio: 4 / 5; min-width: 620px; overflow: hidden; border: 1.5px solid var(--ink); background: var(--card); box-shadow: 10px 10px 0 rgba(18,18,18,.11); }
+    .meta { font-size: 12px; color: color-mix(in srgb, var(--ink) 65%, transparent); }
+    .view-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toggle { min-height: 34px; padding: 0 11px; background: transparent; color: var(--ink); font-size: 12px; }
+    .toggle.active { background: var(--ink); color: var(--paper); }
+    .canvas-wrap { width: 100%; min-height: 620px; display: grid; place-items: center; padding: 22px; border: 1px solid var(--ink); background: repeating-linear-gradient(0deg, transparent, transparent 29px, var(--grid) 30px), repeating-linear-gradient(90deg, transparent, transparent 29px, var(--grid) 30px); overflow: auto; }
+    .canvas { container-type: inline-size; position: relative; width: min(100%, 960px); aspect-ratio: 4 / 5; min-width: 0; overflow: hidden; border: 1.5px solid var(--ink); background: var(--card); box-shadow: 10px 10px 0 rgba(18,18,18,.11); }
+    .canvas.mobile-preview { width: min(375px, 100%); }
     .element { position: absolute; display: grid; place-items: center; padding: 12px; text-align: center; overflow: hidden; border: 1.5px solid currentColor; color: var(--ink); background: var(--fill, transparent); font-weight: 700; line-height: .92; letter-spacing: -.05em; }
-    .element .mini { font-size: clamp(10px, 1.5vw, 16px); letter-spacing: .04em; text-transform: uppercase; }
-    .logo { font-size: clamp(21px, 4vw, 52px); font-weight: 900; letter-spacing: -.09em; }
-    .headline { font-size: clamp(38px, 7vw, 96px); font-weight: 900; }
-    .product { font-size: clamp(27px, 5.5vw, 77px); font-weight: 800; }
-    .contact { font-size: clamp(17px, 2.6vw, 34px); font-weight: 800; }
-    .watermark { position: absolute; right: 1.6%; bottom: 1.4%; z-index: 2; font-size: clamp(7px, 1vw, 12px); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .68; }
+    .element .mini { font-size: clamp(7px, 1.5cqw, 16px); letter-spacing: .04em; text-transform: uppercase; }
+    .logo { font-size: clamp(18px, 4cqw, 52px); font-weight: 900; letter-spacing: -.09em; }
+    .headline { font-size: clamp(28px, 7cqw, 96px); font-weight: 900; }
+    .product { font-size: clamp(22px, 5.5cqw, 77px); font-weight: 800; }
+    .contact { font-size: clamp(11px, 2.6cqw, 34px); font-weight: 800; }
+    .watermark { position: absolute; right: 1.6%; bottom: 1.4%; z-index: 2; font-size: clamp(6px, 1cqw, 12px); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .68; }
     .caption { position: absolute; font-size: clamp(11px, 1.5vw, 18px); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    @media (max-width: 780px) { .app { grid-template-columns: 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--ink); } .tips { margin-top: 0; } main { padding: 18px; } .canvas-wrap { padding: 12px; min-height: 500px; } .canvas { min-width: 520px; } }
+    @media (max-width: 780px) { .app { grid-template-columns: 1fr; } aside { padding: 22px 18px; border-right: 0; border-bottom: 1px solid var(--ink); gap: 20px; } h1 { font-size: 33px; } .tips { margin-top: 0; } main { padding: 18px; gap: 16px; } .topbar { align-items: flex-start; flex-direction: column; gap: 12px; } .view-controls { width: 100%; } .toggle { flex: 1 1 0; padding: 0 8px; } .canvas-wrap { min-height: 0; padding: 12px; } .canvas { width: 100%; box-shadow: 5px 5px 0 rgba(18,18,18,.11); } }
+    @media (max-width: 390px) { .canvas-wrap { padding: 8px; } .element { padding: 7px; } .watermark { letter-spacing: .04em; } }
   </style>
 </head>
 <body>
@@ -56,7 +62,7 @@
       <p class="tips">Every generation keeps the same core building blocks—logo, headline, product, contact—and rearranges their scale, rotation, and position.</p>
     </aside>
     <main>
-      <div class="topbar"><p class="eyebrow">Random composition no. <span id="number">01</span></p><span class="meta">Click Generate for a new arrangement</span></div>
+      <div class="topbar"><p class="eyebrow">Random composition no. <span id="number">01</span></p><div class="view-controls" aria-label="Display controls"><button class="toggle active" id="desktopView">Desktop</button><button class="toggle" id="mobileView">Mobile</button><button class="toggle" id="themeToggle">Dark mode</button></div></div>
       <div class="canvas-wrap"><section class="canvas" id="canvas" aria-label="Generated poster layout"></section></div>
     </main>
   </div>
@@ -66,6 +72,7 @@
     const palette = document.querySelector('#palette');
     const number = document.querySelector('#number');
     let sequence = 0;
+    let currentLayout;
     const palettes = {
       mono: { paper: '#fffdfa', ink: '#121212', accent: '#ff5e3a', soft: '#f0ece4' },
       citrus: { paper: '#fff8d8', ink: '#12302b', accent: '#ff7a00', soft: '#b4e647' },
@@ -85,6 +92,7 @@
     function render() {
       const p = palettes[palette.value];
       const layout = layouts[Math.floor(Math.random() * layouts.length)];
+      currentLayout = layout;
       sequence += 1; number.textContent = String(sequence).padStart(2, '0');
       canvas.style.background = p.paper; canvas.style.color = p.ink;
       canvas.innerHTML = block('logo', 'NOVA', layout.logo, p.soft)
@@ -101,9 +109,51 @@
     document.querySelector('#shuffle').addEventListener('click', render);
     palette.addEventListener('change', render);
     format.addEventListener('change', setFormat);
+    function selectView(isMobile) {
+      canvas.classList.toggle('mobile-preview', isMobile);
+      document.querySelector('#mobileView').classList.toggle('active', isMobile);
+      document.querySelector('#desktopView').classList.toggle('active', !isMobile);
+    }
+    document.querySelector('#desktopView').addEventListener('click', () => selectView(false));
+    document.querySelector('#mobileView').addEventListener('click', () => selectView(true));
+    document.querySelector('#themeToggle').addEventListener('click', () => {
+      const dark = document.body.classList.toggle('dark');
+      document.querySelector('#themeToggle').textContent = dark ? 'Light mode' : 'Dark mode';
+    });
+    function escapeXml(value) {
+      return value.replace(/[<>&'"]/g, character => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[character]);
+    }
+    function createSvgBlock(item, label, fill, fontSize, paletteColor) {
+      const [left, top, width, height, rotate] = item;
+      const svgWidth = 1000;
+      const svgHeight = format.value === 'square' ? 1000 : format.value === 'story' ? 1778 : 1250;
+      const x = left * 10;
+      const y = top * svgHeight / 100;
+      const blockWidth = width * 10;
+      const blockHeight = height * svgHeight / 100;
+      const centerX = x + blockWidth / 2;
+      const centerY = y + blockHeight / 2;
+      const lines = label.split('\n');
+      const lineHeight = fontSize * 1.02;
+      const startY = centerY - ((lines.length - 1) * lineHeight) / 2 + fontSize * .36;
+      const text = lines.map((line, index) => `<text x="${centerX}" y="${startY + index * lineHeight}" text-anchor="middle" font-size="${fontSize}" font-weight="800" letter-spacing="${fontSize > 40 ? -3 : 1}">${escapeXml(line)}</text>`).join('');
+      return `<g transform="rotate(${rotate} ${centerX} ${centerY})"><rect x="${x}" y="${y}" width="${blockWidth}" height="${blockHeight}" fill="${fill}" stroke="${paletteColor.ink}" stroke-width="2"/>${text}</g>`;
+    }
+    function createSvg() {
+      const p = palettes[palette.value];
+      const svgHeight = format.value === 'square' ? 1000 : format.value === 'story' ? 1778 : 1250;
+      const bits = currentLayout.bits.map((item, index) => createSvgBlock(item, `ELEMENT ${index + 1}`, index % 2 ? p.soft : p.paper, 14, p)).join('');
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="${svgHeight}" viewBox="0 0 1000 ${svgHeight}" role="img" aria-label="Random Layout Spark composition"><rect width="1000" height="${svgHeight}" fill="${p.paper}"/><g font-family="Arial, Helvetica, sans-serif" fill="${p.ink}">${createSvgBlock(currentLayout.logo, 'NOVA', p.soft, 55, p)}${createSvgBlock(currentLayout.headline, 'MAKE SPACE\nFOR GOOD IDEAS', p.paper, 70, p)}${createSvgBlock(currentLayout.product, 'YOUR\nPRODUCT', p.accent, 60, p)}${createSvgBlock(currentLayout.contact, 'HELLO@NOVA.STUDIO  /  @NOVASTUDIO', p.soft, 20, p)}${bits}<text x="984" y="${svgHeight - 18}" text-anchor="end" font-size="11" font-weight="700" letter-spacing="1" opacity=".68">DEVELOPED BY HTUN THIT OO @ 2026</text></g></svg>`;
+    }
     document.querySelector('#download').addEventListener('click', () => {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500"><foreignObject width="100%" height="100%">${new XMLSerializer().serializeToString(canvas)}</foreignObject></svg>`;
-      const link = document.createElement('a'); link.download = 'layout-spark.svg'; link.href = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })); link.click(); URL.revokeObjectURL(link.href);
+      const blob = new Blob([createSvg()], { type: 'image/svg+xml;charset=utf-8' });
+      const link = document.createElement('a');
+      link.download = `layout-spark-${format.value}-${String(sequence).padStart(2, '0')}.svg`;
+      link.href = URL.createObjectURL(blob);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 0);
     });
     render();
   </script>
